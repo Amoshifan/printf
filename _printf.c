@@ -1,67 +1,63 @@
 #include "main.h"
 
-void print_buffer(char buffer[], int *buff_ind);
-
 /**
- * _printf - Function for Printf
- * @format: format.
- *
- * Return: Return chars.
+ * _printf - a simulation of the printf function
+ * @format: format string
+ * Return: the string passed to _printf
  */
-
 int _printf(const char *format, ...)
 {
-	int a, printed = 0, printed_chars = 0;
-	int flags, width, precision, size, buff_ind = 0;
-	va_list list;
-	char buffer[BUFF_SIZE];
+	int count = 0;
+	int i, j;
+	va_list args;
+	char *str;
 
-	if (format == NULL)
-		return (-1);
-
-	va_start(list, format);
-
-	for (a = 0; format && format[a] != '\0'; a++)
+	va_start(args, format);
+	for (i = 0; format[i] != '\0'; i++)
 	{
-		if (format[a] != '%')
+		if (format[i] == '%')
 		{
-			buffer[buff_ind++] = format[a];
-			if (buff_ind == BUFF_SIZE)
-				print_buffer(buffer, &buff_ind);
-			printed_chars++;
+			i++;
+			switch (format[i])
+			{
+				case 'c':
+					_putchar(va_arg(args, int));
+					count++;
+					break;
+				case 's':
+					str = va_arg(args, char *);
+					for (j = 0; str[j] != '\0'; j++)
+					{
+						_putchar(str[j]);
+						count++;
+					}
+					break;
+				case '%':
+					_putchar('%');
+					count++;
+					break;
+				default:
+					_putchar(format[i]);
+					count++;
+					break;
+			}
 		}
 		else
 		{
-			print_buffer(buffer, &buff_ind);
-			flags = get_flags(format, &a);
-			width = get_width(format, &a, list);
-			precision = get_precision(format, &a, list);
-			size = get_size(format, &a);
-			++a;
-			printed = handle_print(format, &a, list, buffer,
-				flags, width, precision, size);
-			if (printed == -1)
-				return (-1);
-			printed_chars += printed;
+			_putchar(format[i]);
+			count++;
 		}
 	}
-
-	print_buffer(buffer, &buff_ind);
-
-	va_end(list);
-
-	return (printed_chars);
+	va_end(args);
+	return (count);
 }
 
 /**
- * print_buffer - Prints the contents that exist
- * @buffer: Chars array
- * @buff_ind: Index to add next char, reps the length.
+ * _putchar - function to return character to stdout
+ * @c: a character
+ * Return: @c
  */
-
-void print_buffer(char buffer[], int *buff_ind)
+int _putchar(char c)
 {
-	if (*buff_ind > 0)
-		write(1, &buffer[0], *buff_ind);
-	*buff_ind = 0;
+	return (write(1, &c, 1));
 }
